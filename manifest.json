@@ -1,0 +1,13 @@
+{
+  "background_color": "#e34b4b",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "STUDENT-BUDGET-TRACKER",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Tracker",
+  "start_url": "/",
+  "theme_color": "#5c2acc",
+  "id": "com.budget-tracker ",
+  "description": "TOOL FOR STUDENTS TO TRACK THERE THERE EXPENSES"
+}
