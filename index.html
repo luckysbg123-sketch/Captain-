@@ -621,6 +621,7 @@
 
         function unlockApp(emailLabel) {
             currentUser = { email: emailLabel };
+            localStorage.setItem('campus_spend_user', JSON.stringify(currentUser));
             userEmailDisplay.textContent = emailLabel;
             authModal.classList.add('hidden');
             appWrapper.classList.remove('hidden');
@@ -769,6 +770,7 @@
 
             // Logout Action
             logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('campus_spend_user');
                 if (isFirebaseActive && auth) {
                     auth.signOut().finally(() => {
                         location.reload();
@@ -832,6 +834,21 @@
             loadData();
             syncMonthPicker();
             initAuthListeners();
+            
+            // Check persisted login session so refreshing stays logged in
+            const savedUser = localStorage.getItem('campus_spend_user');
+            if (savedUser) {
+                try {
+                    const parsedUser = JSON.parse(savedUser);
+                    if (parsedUser && parsedUser.email) {
+                        unlockApp(parsedUser.email);
+                        return;
+                    }
+                } catch (e) {
+                    localStorage.removeItem('campus_spend_user');
+                }
+            }
+            
             render();
         };
 
@@ -1434,3 +1451,4 @@
     </script>
 </body>
 </html>
+
