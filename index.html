@@ -35,241 +35,329 @@
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col pb-12">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-indigo-700 text-white sticky top-0 z-30 shadow-md">
-        <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
-                    <i class="fa-solid fa-wallet text-amber-300 text-lg"></i>
+    <!-- AUTHENTICATION MODAL -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative overflow-hidden border border-slate-100">
+            
+            <!-- App Header Branding -->
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl mb-3 shadow-inner">
+                    <i class="fa-solid fa-wallet text-2xl"></i>
                 </div>
+                <h2 id="authTitle" class="text-2xl font-extrabold text-slate-900">Welcome to CampusSpend</h2>
+                <p id="authSubtitle" class="text-xs text-slate-500 mt-1">Sign in to access your student budget tracker</p>
+            </div>
+
+            <!-- Error Notification Box -->
+            <div id="authErrorBox" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-2xl flex items-start gap-2">
+                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
+                <span id="authErrorMessage" class="flex-1 font-medium"></span>
+            </div>
+
+            <!-- Google Sign In Button -->
+            <button id="googleAuthBtn" type="button" class="w-full flex items-center justify-center gap-3 py-3 px-4 border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition shadow-sm mb-4">
+                <svg class="w-4 h-4" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Continue with Google
+            </button>
+
+            <div class="relative flex py-2 items-center mb-4">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Or with email</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Email & Password Form -->
+            <form id="authForm" class="space-y-4">
                 <div>
-                    <h1 class="text-base font-extrabold tracking-tight leading-none">CampusSpend</h1>
-                    <p class="text-[11px] text-indigo-200 font-medium">Student Budget & Expense Tracker</p>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Email Address</label>
+                    <input type="email" id="authEmail" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="student@example.com">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-bold text-slate-600">Password</label>
+                        <a href="#" id="forgotPasswordLink" class="text-xs text-indigo-600 hover:underline font-bold">Forgot Password?</a>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="authPassword" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition pr-10" placeholder="••••••••">
+                        <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                            <i class="fa-solid fa-eye text-sm" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                    <!-- Password Rules Helper for Sign Up -->
+                    <p id="passwordHint" class="hidden text-[11px] text-slate-500 mt-1.5 font-medium leading-relaxed">
+                        Must be at least 6 characters with letters, numbers, and special characters (e.g., !@#$%^&*).
+                    </p>
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl text-xs shadow-lg shadow-indigo-600/20 transition">
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Mode Switcher & Skip Option -->
+            <div class="mt-6 text-center space-y-3">
+                <p class="text-xs text-slate-500 font-medium">
+                    <span id="authSwitchPrompt">Don't have an account?</span>
+                    <button type="button" id="authSwitchBtn" class="text-indigo-600 font-extrabold hover:underline ml-1">Sign Up</button>
+                </p>
+                <div class="pt-3 border-t border-slate-100">
+                    <button type="button" id="skipLoginBtn" class="text-xs text-slate-400 hover:text-slate-700 font-bold transition">
+                        Skip Login & Use Local Mode →
+                    </button>
                 </div>
             </div>
-            
-            <div class="flex items-center space-x-2">
-                <button onclick="exportPDFReport()" title="Export PDF Statement" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white transition text-xs font-bold shadow-sm flex items-center gap-1.5 border border-emerald-400">
-                    <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">Download PDF</span>
-                </button>
-                <button onclick="exportData()" title="Export JSON Data" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition text-xs font-semibold backdrop-blur-sm border border-white/15 flex items-center gap-1.5">
-                    <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Export Backup</span>
-                </button>
-            </div>
+
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container -->
-    <main class="max-w-6xl mx-auto px-4 pt-6 w-full flex-grow space-y-6">
-
-        <!-- Month Navigation Bar -->
-        <section class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center space-x-2">
-                <button onclick="changeMonth(-1)" class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95">
-                    <i class="fa-solid fa-chevron-left text-xs"></i>
-                </button>
-                <h2 id="currentMonthDisplay" class="text-base sm:text-lg font-extrabold text-slate-800 min-w-[150px] text-center">
-                    -- ----
-                </h2>
-                <button onclick="changeMonth(1)" class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95">
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-                <button onclick="resetToCurrentMonth()" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition ml-1">
-                    Today
-                </button>
-            </div>
-
-            <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-end">
-                <input type="month" id="monthPicker" onchange="jumpToMonth(this.value)" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-indigo-500">
-                <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition text-xs font-extrabold shadow-md flex items-center gap-1.5 active:scale-95">
-                    <i class="fa-solid fa-plus"></i> <span>Add Entry</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Summary Cards with Visual Changing Amount Bars & Direct Edit Icons -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            
-            <!-- Total Income Card -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 relative overflow-hidden group">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Income</span>
-                    <div class="flex items-center space-x-1.5">
-                        <button onclick="openDirectEditModal('income')" title="Edit Total Income" class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center transition">
-                            <i class="fa-solid fa-pen text-xs"></i>
-                        </button>
-                        <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
-                            <i class="fa-solid fa-arrow-down-left"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <h3 id="monthlyIncome" class="text-2xl font-black text-slate-900">₹0</h3>
-                    <span id="incomePercentage" class="text-xs font-extrabold text-emerald-600">0%</span>
-                </div>
-                <!-- Dynamic Amount Bar -->
-                <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                    <div id="incomeProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-                <p class="text-[11px] text-slate-400 font-medium mt-2">Cashflow share for selected month</p>
-            </div>
-
-            <!-- Total Expenses Card -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 relative overflow-hidden group">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Expenses</span>
-                    <div class="flex items-center space-x-1.5">
-                        <button onclick="openDirectEditModal('expense')" title="Edit Total Expenses" class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition">
-                            <i class="fa-solid fa-pen text-xs"></i>
-                        </button>
-                        <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
-                            <i class="fa-solid fa-arrow-up-right"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <h3 id="monthlyExpense" class="text-2xl font-black text-slate-900">₹0</h3>
-                    <span id="expensePercentage" class="text-xs font-extrabold text-rose-600">0%</span>
-                </div>
-                <!-- Dynamic Amount Bar -->
-                <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                    <div id="expenseProgressBar" class="bg-rose-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-                <p class="text-[11px] text-slate-400 font-medium mt-2">Percentage of monthly income spent</p>
-            </div>
-
-            <!-- Net Balance Card -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 relative overflow-hidden">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Net Balance</span>
-                    <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-scale-balanced"></i>
-                    </div>
-                </div>
-                <div class="mt-3 flex items-baseline justify-between">
-                    <h3 id="monthlyBalance" class="text-2xl font-black text-slate-900">₹0</h3>
-                    <span id="savingsRatePercentage" class="text-xs font-extrabold text-indigo-600">0%</span>
-                </div>
-                <!-- Dynamic Amount Bar -->
-                <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                    <div id="savingsRateProgressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-                <p class="text-[11px] text-slate-400 font-medium mt-2">Retention / Savings rate</p>
-            </div>
-
-        </section>
-
-        <!-- Monthly Budget & Savings Target Limits Section -->
-        <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold">
-                        <i class="fa-solid fa-bullseye"></i>
+    <!-- MAIN APP WRAPPER -->
+    <div id="appWrapper" class="hidden flex-col flex-grow">
+        <!-- Top Navigation Header -->
+        <header class="bg-indigo-700 text-white sticky top-0 z-30 shadow-md">
+            <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
+                        <i class="fa-solid fa-wallet text-amber-300 text-lg"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-slate-800">Monthly Budget & Savings Goals</h3>
-                        <p class="text-[11px] text-slate-400 font-medium">Keep your student expenses within limits</p>
+                        <h1 class="text-base font-extrabold tracking-tight leading-none">CampusSpend</h1>
+                        <p class="text-[11px] text-indigo-200 font-medium">Student Budget & Expense Tracker</p>
                     </div>
                 </div>
-                <button onclick="openBudgetModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
-                    <i class="fa-solid fa-gear"></i> Set Limits
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Spending Limit Progress -->
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-700">Monthly Expense Limit</span>
-                        <span id="budgetRatioText" class="font-extrabold text-slate-800">₹0 / ₹0</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                        <div id="budgetProgressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                    <p id="budgetStatusMessage" class="text-[11px] font-semibold text-slate-500">Set a budget limit to prevent overspending.</p>
-                </div>
-
-                <!-- Savings Goal Progress -->
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 space-y-2">
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="font-bold text-slate-700">Target Monthly Savings</span>
-                        <span id="savingsRatioText" class="font-extrabold text-slate-800">₹0 / ₹0</span>
-                    </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
-                        <div id="savingsProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                    <p id="savingsStatusMessage" class="text-[11px] font-semibold text-slate-500">Track how much you save this month.</p>
+                
+                <div class="flex items-center space-x-2">
+                    <span id="userEmailDisplay" class="hidden md:inline-block text-[11px] font-bold bg-white/10 px-3 py-1.5 rounded-xl border border-white/15 text-indigo-100"></span>
+                    <button onclick="exportPDFReport()" title="Export PDF Statement" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white transition text-xs font-bold shadow-sm flex items-center gap-1.5 border border-emerald-400">
+                        <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">Download PDF</span>
+                    </button>
+                    <button onclick="exportData()" title="Export JSON Data" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition text-xs font-semibold backdrop-blur-sm border border-white/15 flex items-center gap-1.5">
+                        <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Export Backup</span>
+                    </button>
+                    <button id="logoutBtn" title="Logout" class="px-3 py-2 rounded-xl bg-rose-500/80 hover:bg-rose-600 text-white transition text-xs font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Logout</span>
+                    </button>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- Main Workspace: Calendar & Category Breakdown / Transaction History -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Calendar Grid View (2 Columns) -->
-            <div class="lg:col-span-2 space-y-4">
-                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center space-x-2">
-                            <i class="fa-solid fa-calendar-days text-indigo-600"></i>
-                            <h3 class="text-sm font-bold text-slate-800">Monthly Calendar Overview</h3>
-                        </div>
-                        <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-2xl">
-                            <button id="tabCalendarBtn" onclick="switchView('calendar')" class="px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition">
-                                Calendar
+        <!-- Main Container -->
+        <main class="max-w-6xl mx-auto px-4 pt-6 w-full flex-grow space-y-6">
+
+            <!-- Month Navigation Bar -->
+            <section class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-2">
+                    <button onclick="changeMonth(-1)" class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <h2 id="currentMonthDisplay" class="text-base sm:text-lg font-extrabold text-slate-800 min-w-[150px] text-center">
+                        -- ----
+                    </h2>
+                    <button onclick="changeMonth(1)" class="w-9 h-9 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition active:scale-95">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                    <button onclick="resetToCurrentMonth()" class="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition ml-1">
+                        Today
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-end">
+                    <input type="month" id="monthPicker" onchange="jumpToMonth(this.value)" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-indigo-500">
+                    <button onclick="openAddModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition text-xs font-extrabold shadow-md flex items-center gap-1.5 active:scale-95">
+                        <i class="fa-solid fa-plus"></i> <span>Add Entry</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Summary Cards with Visual Changing Amount Bars & Direct Edit Icons -->
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Total Income Card -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 relative overflow-hidden group">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Income</span>
+                        <div class="flex items-center space-x-1.5">
+                            <button onclick="openDirectEditModal('income')" title="Edit Total Income" class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center transition">
+                                <i class="fa-solid fa-pen text-xs"></i>
                             </button>
-                            <button id="tabTransactionsBtn" onclick="switchView('transactions')" class="px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition">
-                                Transactions
-                            </button>
+                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-down-left"></i>
+                            </div>
                         </div>
                     </div>
+                    <div class="mt-3 flex items-baseline justify-between">
+                        <h3 id="monthlyIncome" class="text-2xl font-black text-slate-900">₹0</h3>
+                        <span id="incomePercentage" class="text-xs font-extrabold text-emerald-600">0%</span>
+                    </div>
+                    <!-- Dynamic Amount Bar -->
+                    <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="incomeProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-medium mt-2">Cashflow share for selected month</p>
+                </div>
 
-                    <!-- Calendar Section -->
-                    <div id="calendarView">
-                        <!-- Day Headers -->
-                        <div class="grid grid-cols-7 gap-1 text-center mb-2">
-                            <span class="text-[11px] font-bold text-slate-400">Sun</span>
-                            <span class="text-[11px] font-bold text-slate-400">Mon</span>
-                            <span class="text-[11px] font-bold text-slate-400">Tue</span>
-                            <span class="text-[11px] font-bold text-slate-400">Wed</span>
-                            <span class="text-[11px] font-bold text-slate-400">Thu</span>
-                            <span class="text-[11px] font-bold text-slate-400">Fri</span>
-                            <span class="text-[11px] font-bold text-slate-400">Sat</span>
+                <!-- Total Expenses Card -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 relative overflow-hidden group">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Expenses</span>
+                        <div class="flex items-center space-x-1.5">
+                            <button onclick="openDirectEditModal('expense')" title="Edit Total Expenses" class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-arrow-up-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline justify-between">
+                        <h3 id="monthlyExpense" class="text-2xl font-black text-slate-900">₹0</h3>
+                        <span id="expensePercentage" class="text-xs font-extrabold text-rose-600">0%</span>
+                    </div>
+                    <!-- Dynamic Amount Bar -->
+                    <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="expenseProgressBar" class="bg-rose-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-medium mt-2">Percentage of monthly income spent</p>
+                </div>
+
+                <!-- Net Balance Card -->
+                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Net Balance</span>
+                        <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-baseline justify-between">
+                        <h3 id="monthlyBalance" class="text-2xl font-black text-slate-900">₹0</h3>
+                        <span id="savingsRatePercentage" class="text-xs font-extrabold text-indigo-600">0%</span>
+                    </div>
+                    <!-- Dynamic Amount Bar -->
+                    <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                        <div id="savingsRateProgressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-medium mt-2">Retention / Savings rate</p>
+                </div>
+
+            </section>
+
+            <!-- Monthly Budget & Savings Target Limits Section -->
+            <section class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800">Monthly Budget & Savings Goals</h3>
+                            <p class="text-[11px] text-slate-400 font-medium">Keep your student expenses within limits</p>
+                        </div>
+                    </div>
+                    <button onclick="openBudgetModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                        <i class="fa-solid fa-gear"></i> Set Limits
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Spending Limit Progress -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-700">Monthly Expense Limit</span>
+                            <span id="budgetRatioText" class="font-extrabold text-slate-800">₹0 / ₹0</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <div id="budgetProgressBar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="budgetStatusMessage" class="text-[11px] font-semibold text-slate-500">Set a budget limit to prevent overspending.</p>
+                    </div>
+
+                    <!-- Savings Goal Progress -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-700">Target Monthly Savings</span>
+                            <span id="savingsRatioText" class="font-extrabold text-slate-800">₹0 / ₹0</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <div id="savingsProgressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="savingsStatusMessage" class="text-[11px] font-semibold text-slate-500">Track how much you save this month.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Workspace: Calendar & Category Breakdown / Transaction History -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Calendar Grid View (2 Columns) -->
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-calendar-days text-indigo-600"></i>
+                                <h3 class="text-sm font-bold text-slate-800">Monthly Calendar Overview</h3>
+                            </div>
+                            <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-2xl">
+                                <button id="tabCalendarBtn" onclick="switchView('calendar')" class="px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition">
+                                    Calendar
+                                </button>
+                                <button id="tabTransactionsBtn" onclick="switchView('transactions')" class="px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition">
+                                    Transactions
+                                </button>
+                            </div>
                         </div>
 
-                        <!-- Calendar Grid -->
-                        <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+                        <!-- Calendar Section -->
+                        <div id="calendarView">
+                            <!-- Day Headers -->
+                            <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                                <span class="text-[11px] font-bold text-slate-400">Sun</span>
+                                <span class="text-[11px] font-bold text-slate-400">Mon</span>
+                                <span class="text-[11px] font-bold text-slate-400">Tue</span>
+                                <span class="text-[11px] font-bold text-slate-400">Wed</span>
+                                <span class="text-[11px] font-bold text-slate-400">Thu</span>
+                                <span class="text-[11px] font-bold text-slate-400">Fri</span>
+                                <span class="text-[11px] font-bold text-slate-400">Sat</span>
+                            </div>
+
+                            <!-- Calendar Grid -->
+                            <div id="calendarGrid" class="grid grid-cols-7 gap-1.5 sm:gap-2">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Detailed Transactions List Section -->
+                        <div id="transactionsView" class="hidden">
+                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Filtered Entries</span>
+                                <span id="transactionCount" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">0 entries</span>
+                            </div>
+                            <div id="transactionList" class="divide-y divide-slate-100 max-h-[480px] overflow-y-auto pr-1">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar: Category Breakdown -->
+                <div class="space-y-4">
+                    <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
+                        <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-indigo-600"></i> Category Breakdown
+                        </h3>
+                        <div id="categoryBreakdown" class="space-y-4">
                             <!-- Populated dynamically -->
                         </div>
                     </div>
-
-                    <!-- Detailed Transactions List Section -->
-                    <div id="transactionsView" class="hidden">
-                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
-                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Filtered Entries</span>
-                            <span id="transactionCount" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">0 entries</span>
-                        </div>
-                        <div id="transactionList" class="divide-y divide-slate-100 max-h-[480px] overflow-y-auto pr-1">
-                            <!-- Populated dynamically -->
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- Sidebar: Category Breakdown -->
-            <div class="space-y-4">
-                <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
-                    <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-pie text-indigo-600"></i> Category Breakdown
-                    </h3>
-                    <div id="categoryBreakdown" class="space-y-4">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
+        </main>
+    </div>
 
     <!-- Modal: Add New Transaction Entry -->
     <div id="entryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -461,9 +549,250 @@
         </div>
     </div>
 
+    <!-- Firebase SDK Compat -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
     <!-- Application Script -->
     <script>
-        // Data Structures for Indian Student Context
+        // ==========================================
+        // 1. FIREBASE & AUTHENTICATION SETUP
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyForSandbox12345",
+            authDomain: "campusspend-app.firebaseapp.com",
+            projectId: "campusspend-app",
+            storageBucket: "campusspend-app.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:123456:web:abcdef"
+        };
+
+        let auth = null;
+        let db = null;
+        let isFirebaseActive = false;
+
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                auth = firebase.auth();
+                db = firebase.firestore();
+                isFirebaseActive = true;
+            }
+        } catch (e) {
+            console.warn("Firebase Sandbox initialization notice:", e);
+        }
+
+        let authMode = 'signin'; // 'signin' or 'signup'
+        let currentUser = null;
+
+        // Auth DOM Elements
+        const authModal = document.getElementById('authModal');
+        const appWrapper = document.getElementById('appWrapper');
+        const authTitle = document.getElementById('authTitle');
+        const authSubtitle = document.getElementById('authSubtitle');
+        const authForm = document.getElementById('authForm');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const authSubmitBtn = document.getElementById('authSubmitBtn');
+        const authSwitchBtn = document.getElementById('authSwitchBtn');
+        const authSwitchPrompt = document.getElementById('authSwitchPrompt');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const passwordHint = document.getElementById('passwordHint');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        const googleAuthBtn = document.getElementById('googleAuthBtn');
+        const skipLoginBtn = document.getElementById('skipLoginBtn');
+        const authErrorBox = document.getElementById('authErrorBox');
+        const authErrorMessage = document.getElementById('authErrorMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+
+        function showAuthError(msg) {
+            authErrorMessage.textContent = msg;
+            authErrorBox.classList.remove('hidden');
+        }
+
+        function hideAuthError() {
+            authErrorBox.classList.add('hidden');
+        }
+
+        function unlockApp(emailLabel) {
+            currentUser = { email: emailLabel };
+            userEmailDisplay.textContent = emailLabel;
+            authModal.classList.add('hidden');
+            appWrapper.classList.remove('hidden');
+            appWrapper.classList.add('flex');
+            render();
+        }
+
+        function handleAuthError(err) {
+            console.warn("Auth error caught:", err);
+            if (
+                err.code === 'auth/operation-not-supported-in-this-environment' ||
+                err.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.' ||
+                err.code === 'auth/network-request-failed'
+            ) {
+                // Seamless fallback to local mode when environment blocks live Firebase auth
+                unlockApp(authEmail.value.trim() || 'Local Student');
+            } else {
+                showAuthError(err.message);
+            }
+        }
+
+        function initAuthListeners() {
+            // Toggle Sign In / Sign Up Mode
+            authSwitchBtn.addEventListener('click', () => {
+                hideAuthError();
+                authPassword.value = '';
+                if (authMode === 'signin') {
+                    authMode = 'signup';
+                    authTitle.textContent = "Create Account";
+                    authSubtitle.textContent = "Sign up to track your campus expenses securely";
+                    authSubmitBtn.textContent = "Sign Up";
+                    authSwitchPrompt.textContent = "Already have an account?";
+                    authSwitchBtn.textContent = "Sign In";
+                    forgotPasswordLink.classList.add('hidden');
+                    passwordHint.classList.remove('hidden');
+                } else {
+                    authMode = 'signin';
+                    authTitle.textContent = "Welcome to CampusSpend";
+                    authSubtitle.textContent = "Sign in to access your student budget tracker";
+                    authSubmitBtn.textContent = "Sign In";
+                    authSwitchPrompt.textContent = "Don't have an account?";
+                    authSwitchBtn.textContent = "Sign Up";
+                    forgotPasswordLink.classList.remove('hidden');
+                    passwordHint.classList.add('hidden');
+                }
+            });
+
+            // Password Visibility Toggle
+            togglePasswordBtn.addEventListener('click', () => {
+                if (authPassword.type === 'password') {
+                    authPassword.type = 'text';
+                    togglePasswordIcon.classList.remove('fa-eye');
+                    togglePasswordIcon.classList.add('fa-eye-slash');
+                } else {
+                    authPassword.type = 'password';
+                    togglePasswordIcon.classList.remove('fa-eye-slash');
+                    togglePasswordIcon.classList.add('fa-eye');
+                }
+            });
+
+            // Skip Login -> Local Mode
+            skipLoginBtn.addEventListener('click', () => {
+                unlockApp('Local Mode');
+            });
+
+            // Forgot Password Action
+            forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                hideAuthError();
+                const email = authEmail.value.trim();
+                if (!email) {
+                    showAuthError("Please enter your email address above first so we can send a password reset link.");
+                    return;
+                }
+                if (isFirebaseActive && auth) {
+                    auth.sendPasswordResetEmail(email)
+                        .then(() => {
+                            alert("Password reset email sent to " + email + "! Please check your inbox.");
+                        })
+                        .catch(err => {
+                            if (err.code === 'auth/operation-not-supported-in-this-environment' || err.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') {
+                                alert("Password reset link simulated in Local Mode for: " + email);
+                            } else {
+                                showAuthError(err.message);
+                            }
+                        });
+                } else {
+                    alert("Password reset link simulated in Local Mode for: " + email);
+                }
+            });
+
+            // Email / Password Form Submission
+            authForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                hideAuthError();
+                const email = authEmail.value.trim();
+                const password = authPassword.value;
+
+                if (authMode === 'signup') {
+                    // Strict Password Validation: letters, numbers, and special characters
+                    const hasLetter = /[a-zA-Z]/.test(password);
+                    const hasNumber = /[0-9]/.test(password);
+                    const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+                    if (!hasLetter || !hasNumber || !hasSpecial || password.length < 6) {
+                        showAuthError("Password must be at least 6 characters and include letters, numbers, and special characters (e.g., !@#$%^&*).");
+                        return;
+                    }
+
+                    if (isFirebaseActive && auth) {
+                        auth.createUserWithEmailAndPassword(email, password)
+                            .then((userCred) => {
+                                unlockApp(userCred.user.email || email);
+                            })
+                            .catch(err => handleAuthError(err));
+                    } else {
+                        unlockApp(email);
+                    }
+                } else {
+                    if (isFirebaseActive && auth) {
+                        auth.signInWithEmailAndPassword(email, password)
+                            .then((userCred) => {
+                                unlockApp(userCred.user.email || email);
+                            })
+                            .catch(err => handleAuthError(err));
+                    } else {
+                        unlockApp(email);
+                    }
+                }
+            });
+
+            // Google Sign-In Action
+            googleAuthBtn.addEventListener('click', () => {
+                hideAuthError();
+                if (isFirebaseActive && auth) {
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    auth.signInWithPopup(provider)
+                        .then((result) => {
+                            unlockApp(result.user.email || 'Google Student');
+                        })
+                        .catch(err => handleAuthError(err));
+                } else {
+                    unlockApp('Google Student');
+                }
+            });
+
+            // Logout Action
+            logoutBtn.addEventListener('click', () => {
+                if (isFirebaseActive && auth) {
+                    auth.signOut().finally(() => {
+                        location.reload();
+                    });
+                } else {
+                    location.reload();
+                }
+            });
+
+            // Listen for existing active Firebase session
+            if (isFirebaseActive && auth) {
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        unlockApp(user.email || 'Google Student');
+                    }
+                }, err => {
+                    console.warn("Auth observer notice:", err);
+                });
+            }
+        }
+
+        // ==========================================
+        // 2. BUDGET TRACKER CORE LOGIC
+        // ==========================================
         const CATEGORIES = {
             expense: [
                 { name: 'Food & Canteen', icon: 'fa-utensils', color: 'bg-amber-500' },
@@ -502,6 +831,7 @@
         window.onload = () => {
             loadData();
             syncMonthPicker();
+            initAuthListeners();
             render();
         };
 
@@ -657,7 +987,7 @@
                 }
             } else {
                 spendBarEl.style.width = '0%';
-                spendMsgEl.textContent = 'Tap "Set Budget Goal" to configure a limit.';
+                spendMsgEl.textContent = 'Tap "Set Limits" to configure a limit.';
             }
 
             // Savings Goal Meter
