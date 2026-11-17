@@ -14,7 +14,7 @@
     <!-- html2pdf.js for Professional PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Firebase SDK (Compat version for easy script tag usage) -->
+    <!-- Firebase SDK (Compat version) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -261,6 +261,43 @@
         </div>
     </main>
 
+    <!-- Modal: Add New Transaction Entry -->
+    <div id="entryModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-slate-100">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-base font-bold text-slate-800">Add New Entry</h3>
+                <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center transition hover:bg-slate-200">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="entryForm" onsubmit="saveEntry(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-2xl">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="type" value="expense" checked class="peer hidden">
+                        <div class="py-2 text-center text-xs font-extrabold rounded-xl text-slate-600 peer-checked:bg-white peer-checked:text-rose-600 peer-checked:shadow-sm transition">Expense</div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="type" value="income" class="peer hidden">
+                        <div class="py-2 text-center text-xs font-extrabold rounded-xl text-slate-600 peer-checked:bg-white peer-checked:text-emerald-600 peer-checked:shadow-sm transition">Income</div>
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Date</label>
+                    <input type="date" id="entryDate" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Description / Title</label>
+                    <input type="text" id="entryTitle" placeholder="e.g. Canteen Lunch, Books" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Amount (₹)</label>
+                    <input type="number" id="entryAmount" step="1" min="1" placeholder="0" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-bold shadow-md transition">Save Entry</button>
+            </form>
+        </div>
+    </div>
+
     <!-- AUTHENTICATION MODAL -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative border border-slate-100">
@@ -268,8 +305,8 @@
                 <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
-                <h2 class="text-xl font-black text-slate-900">Welcome to CampusSpend</h2>
-                <p class="text-xs text-slate-500 mt-1">Sign in or create an account to sync your student budget</p>
+                <h2 id="authModalTitle" class="text-xl font-black text-slate-900">Welcome to CampusSpend</h2>
+                <p id="authModalSubtitle" class="text-xs text-slate-500 mt-1">Sign in to access your student budget tracker</p>
             </div>
 
             <form onsubmit="handleAuthSubmit(event)" class="space-y-4">
@@ -289,7 +326,7 @@
             </form>
 
             <div class="mt-4 text-center">
-                <button onclick="toggleAuthMode()" id="authToggleText" class="text-xs font-semibold text-indigo-600 hover:underline">
+                <button type="button" onclick="toggleAuthMode()" id="authToggleText" class="text-xs font-semibold text-indigo-600 hover:underline">
                     Don't have an account? Sign Up
                 </button>
             </div>
@@ -301,9 +338,9 @@
 
     <!-- Firebase Script & App Logic -->
     <script>
-        // Your Firebase Configuration (Pasted from your Firebase Console)
+        // Your Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyD...", // Replace or ensure your config is here
+            apiKey: "AIzaSyD...", // Replace with your actual Firebase config if needed
             authDomain: "campusspend.firebaseapp.com",
             projectId: "campusspend",
             storageBucket: "campusspend.appspot.com",
@@ -324,7 +361,175 @@
             isSignUpMode = !isSignUpMode;
             const btn = document.getElementById('authSubmitBtn');
             const toggle = document.getElementById('authToggleText');
+            const title = document.getElementById('authModalTitle');
+            const subtitle = document.getElementById('authModalSubtitle');
+
             if (isSignUpMode) {
-                btn.innerText = "Create Account";
-                toggle.innerText = "Already have an account? Sign In";
-      
+                if (title) title.innerText = "Create Student Account";
+                if (subtitle) subtitle.innerText = "Sign up to start tracking your budget";
+                if (btn) btn.innerText = "Create Account";
+                if (toggle) toggle.innerText = "Already have an account? Sign In";
+            } else {
+                if (title) title.innerText = "Welcome to CampusSpend";
+                if (subtitle) subtitle.innerText = "Sign in to access your student budget tracker";
+                if (btn) btn.innerText = "Sign In";
+                if (toggle) toggle.innerText = "Don't have an account? Sign Up";
+            }
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const errorDiv = document.getElementById('authErrorMsg');
+            errorDiv.classList.add('hidden');
+
+            if (isSignUpMode) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        document.getElementById('authModal').classList.add('hidden');
+                    })
+                    .catch((error) => {
+                        errorDiv.innerText = error.message;
+                        errorDiv.classList.remove('hidden');
+                    });
+            } else {
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        document.getElementById('authModal').classList.add('hidden');
+                    })
+                    .catch((error) => {
+                        errorDiv.innerText = error.message;
+                        errorDiv.classList.remove('hidden');
+                    });
+            }
+        }
+
+        function logoutUser() {
+            auth.signOut().then(() => {
+                location.reload();
+            });
+        }
+
+        // Auth State Listener
+        auth.onAuthStateChanged((user) => {
+            const modal = document.getElementById('authModal');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const emailDisplay = document.getElementById('userEmailDisplay');
+            if (user) {
+                modal.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                emailDisplay.innerText = user.email;
+                initAppData();
+            } else {
+                modal.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+            }
+        });
+
+        // App State & Functions
+        let currentDate = new Date();
+        let entries = JSON.parse(localStorage.getItem('campusspend_entries')) || [];
+
+        function initAppData() {
+            updateMonthDisplay();
+            renderCalendar();
+            renderSummary();
+        }
+
+        function updateMonthDisplay() {
+            const options = { month: 'long', year: 'numeric' };
+            document.getElementById('currentMonthDisplay').innerText = currentDate.toLocaleDateString('en-IN', options);
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            updateMonthDisplay();
+            renderCalendar();
+        }
+
+        function resetToCurrentMonth() {
+            currentDate = new Date();
+            updateMonthDisplay();
+            renderCalendar();
+        }
+
+        function jumpToMonth(value) {
+            if (!value) return;
+            const [year, month] = value.split('-');
+            currentDate = new Date(year, month - 1, 1);
+            updateMonthDisplay();
+            renderCalendar();
+        }
+
+        function openAddModal() {
+            document.getElementById('entryModal').classList.remove('hidden');
+            document.getElementById('entryDate').valueAsDate = new Date();
+        }
+
+        function closeAddModal() {
+            document.getElementById('entryModal').classList.add('hidden');
+        }
+
+        function saveEntry(e) {
+            e.preventDefault();
+            const type = document.querySelector('input[name="type"]:checked').value;
+            const date = document.getElementById('entryDate').value;
+            const title = document.getElementById('entryTitle').value;
+            const amount = parseFloat(document.getElementById('entryAmount').value);
+
+            entries.push({ id: Date.now(), type, date, title, amount });
+            localStorage.setItem('campusspend_entries', JSON.stringify(entries));
+
+            closeAddModal();
+            document.getElementById('entryForm').reset();
+            renderCalendar();
+            renderSummary();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = "bg-slate-50 border border-slate-100 rounded-2xl p-2 h-20 text-xs font-bold text-slate-700";
+                dayEl.innerText = i;
+                grid.appendChild(dayEl);
+            }
+        }
+
+        function renderSummary() {
+            document.getElementById('monthlyIncome').innerText = "₹0";
+            document.getElementById('monthlyExpense').innerText = "₹0";
+            document.getElementById('monthlyBalance').innerText = "₹0";
+        }
+
+        function switchView(view) {
+            const calView = document.getElementById('calendarView');
+            const txView = document.getElementById('transactionsView');
+            const calBtn = document.getElementById('tabCalendarBtn');
+            const txBtn = document.getElementById('tabTransactionsBtn');
+
+            if (view === 'calendar') {
+                calView.classList.remove('hidden');
+                txView.classList.add('hidden');
+                calBtn.className = "px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition";
+                txBtn.className = "px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition";
+            } else {
+                calView.classList.add('hidden');
+                txView.classList.remove('hidden');
+                txBtn.className = "px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition";
+                calBtn.className = "px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition";
+            }
+        }
+
+        function exportPDFReport() {
+            const element = document.body;
+            html2pdf().from(element).save('CampusSpend-Report.pdf');
+        }
+
+        function openBudgetModal() {}
+        function openDirectEditModal(type) {}
+    </script>
+</body>
+</html>
