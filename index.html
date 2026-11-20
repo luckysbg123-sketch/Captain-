@@ -174,7 +174,7 @@
                 </div>
             </section>
 
-            <!-- Summary Cards with Visual Changing Amount Bars & Direct Edit Icons -->
+            <!-- Summary Cards with Visual Changing Amount Bars & Online/Offline Cash Split -->
             <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 
                 <!-- Total Income Card -->
@@ -198,7 +198,10 @@
                     <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div id="incomeProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <p class="text-[11px] text-slate-400 font-medium mt-2">Cashflow share for selected month</p>
+                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
+                        <span class="text-indigo-600 flex items-center gap-1"><i class="fa-solid fa-mobile-screen-button"></i> Online: <span id="onlineIncomeDisplay">₹0</span></span>
+                        <span class="text-amber-600 flex items-center gap-1"><i class="fa-solid fa-money-bill-wave"></i> Cash: <span id="cashIncomeDisplay">₹0</span></span>
+                    </div>
                 </div>
 
                 <!-- Total Expenses Card -->
@@ -222,7 +225,10 @@
                     <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div id="expenseProgressBar" class="bg-rose-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <p class="text-[11px] text-slate-400 font-medium mt-2">Percentage of monthly income spent</p>
+                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
+                        <span class="text-indigo-600 flex items-center gap-1"><i class="fa-solid fa-mobile-screen-button"></i> Online: <span id="onlineExpenseDisplay">₹0</span></span>
+                        <span class="text-amber-600 flex items-center gap-1"><i class="fa-solid fa-money-bill-wave"></i> Cash: <span id="cashExpenseDisplay">₹0</span></span>
+                    </div>
                 </div>
 
                 <!-- Net Balance Card -->
@@ -241,7 +247,10 @@
                     <div class="mt-3 w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div id="savingsRateProgressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                    <p class="text-[11px] text-slate-400 font-medium mt-2">Retention / Savings rate</p>
+                    <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold">
+                        <span class="text-indigo-600 flex items-center gap-1"><i class="fa-solid fa-building-columns"></i> Bank/UPI: <span id="onlineBalanceDisplay">₹0</span></span>
+                        <span class="text-amber-600 flex items-center gap-1"><i class="fa-solid fa-wallet"></i> In-Hand Cash: <span id="cashBalanceDisplay">₹0</span></span>
+                    </div>
                 </div>
 
             </section>
@@ -290,23 +299,26 @@
                 </div>
             </section>
 
-            <!-- Main Workspace: Calendar & Category Breakdown / Transaction History -->
+            <!-- Main Workspace: Calendar & Category Breakdown / Transaction History / Cash Wallet -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <!-- Calendar Grid View (2 Columns) -->
+                <!-- Calendar / Transactions / Cash Wallet Grid View (2 Columns) -->
                 <div class="lg:col-span-2 space-y-4">
                     <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80">
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
                             <div class="flex items-center space-x-2">
-                                <i class="fa-solid fa-calendar-days text-indigo-600"></i>
-                                <h3 class="text-sm font-bold text-slate-800">Monthly Calendar Overview</h3>
+                                <i id="viewHeaderIcon" class="fa-solid fa-calendar-days text-indigo-600"></i>
+                                <h3 id="viewHeaderTitle" class="text-sm font-bold text-slate-800">Monthly Calendar Overview</h3>
                             </div>
                             <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-2xl">
-                                <button id="tabCalendarBtn" onclick="switchView('calendar')" class="px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition">
+                                <button id="tabCalendarBtn" onclick="switchView('calendar')" class="px-3.5 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition">
                                     Calendar
                                 </button>
-                                <button id="tabTransactionsBtn" onclick="switchView('transactions')" class="px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition">
+                                <button id="tabTransactionsBtn" onclick="switchView('transactions')" class="px-3.5 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-200/60 transition">
                                     Transactions
+                                </button>
+                                <button id="tabCashWalletBtn" onclick="switchView('cash')" class="px-3.5 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-200/60 transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-money-bill-wave text-amber-500"></i> Cash Wallet
                                 </button>
                             </div>
                         </div>
@@ -333,13 +345,70 @@
                         <!-- Detailed Transactions List Section -->
                         <div id="transactionsView" class="hidden">
                             <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100">
-                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Filtered Entries</span>
+                                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">All Monthly Entries</span>
                                 <span id="transactionCount" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">0 entries</span>
                             </div>
                             <div id="transactionList" class="divide-y divide-slate-100 max-h-[480px] overflow-y-auto pr-1">
                                 <!-- Populated dynamically -->
                             </div>
                         </div>
+
+                        <!-- Dedicated Online vs Offline Cash Wallet Page/View -->
+                        <div id="cashWalletView" class="hidden space-y-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Offline Physical Cash Card -->
+                                <div class="bg-gradient-to-br from-amber-50 to-orange-50/70 border border-amber-200/80 rounded-2xl p-4 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-extrabold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+                                            <i class="fa-solid fa-money-bill-wave text-amber-600"></i> Offline Cash Wallet
+                                        </span>
+                                        <button onclick="openAddModalWithMode('offline')" class="px-2.5 py-1 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-bold shadow-sm transition">
+                                            + Add Cash
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] text-amber-700/80 font-medium">Available Cash in Hand</p>
+                                        <h4 id="walletCashNet" class="text-2xl font-black text-amber-950 mt-0.5">₹0</h4>
+                                    </div>
+                                    <div class="flex justify-between text-xs pt-2 border-t border-amber-200/60 font-bold">
+                                        <span class="text-emerald-700">In: <span id="walletCashIn">₹0</span></span>
+                                        <span class="text-rose-700">Out: <span id="walletCashOut">₹0</span></span>
+                                    </div>
+                                </div>
+
+                                <!-- Online UPI / Bank Card -->
+                                <div class="bg-gradient-to-br from-indigo-50 to-blue-50/70 border border-indigo-200/80 rounded-2xl p-4 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-extrabold text-indigo-800 uppercase tracking-wider flex items-center gap-1.5">
+                                            <i class="fa-solid fa-mobile-screen-button text-indigo-600"></i> Online / UPI Account
+                                        </span>
+                                        <button onclick="openAddModalWithMode('online')" class="px-2.5 py-1 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold shadow-sm transition">
+                                            + Add Online
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <p class="text-[11px] text-indigo-700/80 font-medium">Available Online Balance</p>
+                                        <h4 id="walletOnlineNet" class="text-2xl font-black text-indigo-950 mt-0.5">₹0</h4>
+                                    </div>
+                                    <div class="flex justify-between text-xs pt-2 border-t border-indigo-200/60 font-bold">
+                                        <span class="text-emerald-700">In: <span id="walletOnlineIn">₹0</span></span>
+                                        <span class="text-rose-700">Out: <span id="walletOnlineOut">₹0</span></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Offline Cash Transactions Log -->
+                            <div>
+                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
+                                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Physical Cash Transactions</span>
+                                    <span id="cashTransactionCount" class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-xl">0 cash entries</span>
+                                </div>
+                                <div id="cashTransactionList" class="divide-y divide-slate-100 max-h-[340px] overflow-y-auto pr-1">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -386,6 +455,25 @@
                     </label>
                 </div>
 
+                <!-- Payment Mode Selection (Online vs Offline Cash) -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Payment Mode (Wallet)</label>
+                    <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-2xl">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="paymentMode" value="online" checked class="peer hidden">
+                            <div class="py-2 text-center text-xs font-extrabold rounded-xl text-slate-600 peer-checked:bg-white peer-checked:text-indigo-600 peer-checked:shadow-sm transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-mobile-screen-button"></i> Online / UPI
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="paymentMode" value="offline" class="peer hidden">
+                            <div class="py-2 text-center text-xs font-extrabold rounded-xl text-slate-600 peer-checked:bg-white peer-checked:text-amber-600 peer-checked:shadow-sm transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-money-bill-wave"></i> Offline Cash
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Date -->
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Date</label>
@@ -395,7 +483,7 @@
                 <!-- Title / Description -->
                 <div>
                     <label class="block text-xs font-bold text-slate-600 mb-1">Description / Title</label>
-                    <input type="text" id="entryTitle" placeholder="e.g. Canteen Lunch, Book purchase" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                    <input type="text" id="entryTitle" placeholder="e.g. Canteen Lunch, Cash Allowance" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
 
                 <!-- Amount in Rupee -->
@@ -474,6 +562,13 @@
                     <input type="number" id="directEditAmount" step="1" min="0" placeholder="0" required class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
                     <p class="text-[11px] text-slate-400 mt-1.5">This will adjust the overall total for the current month.</p>
                 </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Wallet Mode</label>
+                    <select id="directEditMode" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-3.5 py-2 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="online">Online / UPI</option>
+                        <option value="offline">Offline Cash</option>
+                    </select>
+                </div>
                 <div class="flex items-center space-x-2 pt-2">
                     <button type="button" onclick="closeDirectEditModal()" class="w-1/2 py-2.5 rounded-2xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition">
                         Cancel
@@ -532,6 +627,7 @@
                             <th class="py-2 px-3">Date</th>
                             <th class="py-2 px-3">Description</th>
                             <th class="py-2 px-3">Category</th>
+                            <th class="py-2 px-3">Mode</th>
                             <th class="py-2 px-3">Type</th>
                             <th class="py-2 px-3 text-right">Amount (₹)</th>
                         </tr>
@@ -557,15 +653,67 @@
     <!-- Application Script -->
     <script>
         // ==========================================
-        // 1. FIREBASE & AUTHENTICATION SETUP
+        // 1. PERSISTENT STORAGE HELPER (With Cookie & Memory Fallback)
+        // ==========================================
+        const SafeStorage = {
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (e) {
+                    console.warn("localStorage unavailable, using cookie fallback:", e);
+                }
+                try {
+                    sessionStorage.setItem(key, value);
+                } catch (e) {}
+                // Also set a 30-day cookie fallback so refresh always persists even in strict frames
+                try {
+                    const d = new Date();
+                    d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
+                    document.cookie = `${key}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+                } catch (e) {}
+            },
+            get(key) {
+                try {
+                    const val = localStorage.getItem(key);
+                    if (val !== null) return val;
+                } catch (e) {}
+                try {
+                    const val = sessionStorage.getItem(key);
+                    if (val !== null) return val;
+                } catch (e) {}
+                // Fallback to cookie
+                try {
+                    const nameEQ = key + "=";
+                    const ca = document.cookie.split(';');
+                    for (let i = 0; i < ca.length; i++) {
+                        let c = ca[i].trim();
+                        if (c.indexOf(nameEQ) === 0) {
+                            return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                        }
+                    }
+                } catch (e) {}
+                return null;
+            },
+            remove(key) {
+                try { localStorage.removeItem(key); } catch (e) {}
+                try { sessionStorage.removeItem(key); } catch (e) {}
+                try {
+                    document.cookie = `${key}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax`;
+                } catch (e) {}
+            }
+        };
+
+        // ==========================================
+        // 2. FIREBASE & AUTHENTICATION SETUP
         // ==========================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDummyKeyForSandbox12345",
-            authDomain: "campusspend-app.firebaseapp.com",
-            projectId: "campusspend-app",
-            storageBucket: "campusspend-app.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:123456:web:abcdef"
+            apiKey: "AIzaSyC6KTcPuY-Lx9J1_dSqCFFNJJwApmQ1tx0",
+            authDomain: "campuspend.firebaseapp.com",
+            projectId: "campuspend",
+            storageBucket: "campuspend.firebasestorage.app",
+            messagingSenderId: "930089949615",
+            appId: "1:930089949615:web:f69a1b0a189915e4ebf75a",
+            measurementId: "G-X010P07TP7"
         };
 
         let auth = null;
@@ -610,6 +758,12 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const userEmailDisplay = document.getElementById('userEmailDisplay');
 
+        // User-scoped storage keys so each user starts clean at ₹0
+        function getUserStoragePrefix() {
+            if (!currentUser || !currentUser.email) return 'guest';
+            return currentUser.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        }
+
         function showAuthError(msg) {
             authErrorMessage.textContent = msg;
             authErrorBox.classList.remove('hidden');
@@ -619,28 +773,37 @@
             authErrorBox.classList.add('hidden');
         }
 
-        function unlockApp(emailLabel) {
-            currentUser = { email: emailLabel };
-            localStorage.setItem('campus_spend_user', JSON.stringify(currentUser));
+        function unlockApp(user, isGuest = false) {
+            const emailLabel = isGuest ? 'Local Mode' : (user?.email || 'CampusSpend Student');
+            currentUser = isGuest
+                ? { email: 'guest', isGuest: true }
+                : { email: emailLabel, uid: user.uid, isGuest: false };
+            if (isGuest) SafeStorage.set('campus_spend_guest', 'true');
+            else SafeStorage.remove('campus_spend_guest');
             userEmailDisplay.textContent = emailLabel;
             authModal.classList.add('hidden');
             appWrapper.classList.remove('hidden');
             appWrapper.classList.add('flex');
+            loadData();
             render();
         }
 
         function handleAuthError(err) {
-            console.warn("Auth error caught:", err);
-            if (
-                err.code === 'auth/operation-not-supported-in-this-environment' ||
-                err.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.' ||
-                err.code === 'auth/network-request-failed'
-            ) {
-                // Seamless fallback to local mode when environment blocks live Firebase auth
-                unlockApp(authEmail.value.trim() || 'Local Student');
-            } else {
-                showAuthError(err.message);
-            }
+            console.warn('Firebase authentication error:', err);
+            const messages = {
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/user-not-found': 'No account was found with this email. Please sign up first.',
+                'auth/wrong-password': 'Incorrect password. Please try again.',
+                'auth/invalid-credential': 'Email or password is incorrect. Please try again.',
+                'auth/email-already-in-use': 'This email already has an account. Please sign in instead.',
+                'auth/weak-password': 'Please choose a stronger password (at least 6 characters).',
+                'auth/popup-closed-by-user': 'The Google sign-in window was closed before completion.',
+                'auth/popup-blocked': 'Your browser blocked the Google sign-in popup. Allow popups and try again.',
+                'auth/unauthorized-domain': 'This website domain is not authorized in Firebase. Add it under Authentication → Settings → Authorized domains.',
+                'auth/network-request-failed': 'Network error. Check your internet connection and try again.',
+                'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'Firebase rejected the API key. Check that the Web App config belongs to the CampusSpend project.'
+            };
+            showAuthError(messages[err.code] || err.message || 'Authentication failed. Please try again.');
         }
 
         function initAuthListeners() {
@@ -684,7 +847,7 @@
 
             // Skip Login -> Local Mode
             skipLoginBtn.addEventListener('click', () => {
-                unlockApp('Local Mode');
+                unlockApp(null, true);
             });
 
             // Forgot Password Action
@@ -696,21 +859,13 @@
                     showAuthError("Please enter your email address above first so we can send a password reset link.");
                     return;
                 }
-                if (isFirebaseActive && auth) {
-                    auth.sendPasswordResetEmail(email)
-                        .then(() => {
-                            alert("Password reset email sent to " + email + "! Please check your inbox.");
-                        })
-                        .catch(err => {
-                            if (err.code === 'auth/operation-not-supported-in-this-environment' || err.code === 'auth/api-key-not-valid.-please-pass-a-valid-api-key.') {
-                                alert("Password reset link simulated in Local Mode for: " + email);
-                            } else {
-                                showAuthError(err.message);
-                            }
-                        });
-                } else {
-                    alert("Password reset link simulated in Local Mode for: " + email);
+                if (!isFirebaseActive || !auth) {
+                    showAuthError('Firebase is not available. Check your internet connection and Firebase configuration.');
+                    return;
                 }
+                auth.sendPasswordResetEmail(email)
+                    .then(() => alert('Password reset email sent to ' + email + '. Please check your inbox and spam folder.'))
+                    .catch(handleAuthError);
             });
 
             // Email / Password Form Submission
@@ -731,69 +886,67 @@
                         return;
                     }
 
-                    if (isFirebaseActive && auth) {
-                        auth.createUserWithEmailAndPassword(email, password)
-                            .then((userCred) => {
-                                unlockApp(userCred.user.email || email);
-                            })
-                            .catch(err => handleAuthError(err));
-                    } else {
-                        unlockApp(email);
+                    if (!isFirebaseActive || !auth) {
+                        showAuthError('Firebase could not be initialized. Please refresh the page and try again, or use Local Mode.');
+                        return;
                     }
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then(userCred => unlockApp(userCred.user))
+                        .catch(handleAuthError);
                 } else {
-                    if (isFirebaseActive && auth) {
-                        auth.signInWithEmailAndPassword(email, password)
-                            .then((userCred) => {
-                                unlockApp(userCred.user.email || email);
-                            })
-                            .catch(err => handleAuthError(err));
-                    } else {
-                        unlockApp(email);
+                    if (!isFirebaseActive || !auth) {
+                        showAuthError('Firebase could not be initialized. Please refresh the page and try again, or use Local Mode.');
+                        return;
                     }
+                    auth.signInWithEmailAndPassword(email, password)
+                        .then(userCred => unlockApp(userCred.user))
+                        .catch(handleAuthError);
                 }
             });
 
             // Google Sign-In Action
             googleAuthBtn.addEventListener('click', () => {
                 hideAuthError();
-                if (isFirebaseActive && auth) {
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    auth.signInWithPopup(provider)
-                        .then((result) => {
-                            unlockApp(result.user.email || 'Google Student');
-                        })
-                        .catch(err => handleAuthError(err));
-                } else {
-                    unlockApp('Google Student');
+                if (!isFirebaseActive || !auth) {
+                    showAuthError('Firebase could not be initialized. Please refresh the page and try again, or use Local Mode.');
+                    return;
                 }
+                const provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider)
+                    .then(result => unlockApp(result.user))
+                    .catch(handleAuthError);
             });
 
             // Logout Action
             logoutBtn.addEventListener('click', () => {
-                localStorage.removeItem('campus_spend_user');
+                SafeStorage.remove('campus_spend_guest');
+                currentUser = null;
                 if (isFirebaseActive && auth) {
-                    auth.signOut().finally(() => {
-                        location.reload();
-                    });
+                    auth.signOut().finally(() => location.reload());
                 } else {
                     location.reload();
                 }
             });
 
-            // Listen for existing active Firebase session
+            // Firebase is the source of truth for signed-in accounts.
             if (isFirebaseActive && auth) {
                 auth.onAuthStateChanged(user => {
                     if (user) {
-                        unlockApp(user.email || 'Google Student');
+                        unlockApp(user);
+                    } else if (SafeStorage.get('campus_spend_guest') === 'true') {
+                        unlockApp(null, true);
+                    } else {
+                        currentUser = null;
+                        authModal.classList.remove('hidden');
+                        appWrapper.classList.add('hidden');
+                        appWrapper.classList.remove('flex');
                     }
-                }, err => {
-                    console.warn("Auth observer notice:", err);
-                });
+                }, err => handleAuthError(err));
             }
         }
 
         // ==========================================
-        // 2. BUDGET TRACKER CORE LOGIC
+        // 3. BUDGET TRACKER CORE LOGIC
         // ==========================================
         const CATEGORIES = {
             expense: [
@@ -808,6 +961,7 @@
             ],
             income: [
                 { name: 'Pocket Money', icon: 'fa-hand-holding-dollar', color: 'bg-emerald-500' },
+                { name: 'Cash Allowance / Home', icon: 'fa-money-bill-wave', color: 'bg-amber-500' },
                 { name: 'Part-time Work', icon: 'fa-briefcase', color: 'bg-blue-500' },
                 { name: 'Scholarship', icon: 'fa-graduation-cap', color: 'bg-indigo-500' },
                 { name: 'Other Income', icon: 'fa-sack-dollar', color: 'bg-teal-500' }
@@ -823,59 +977,69 @@
             }).format(num);
         };
 
-        // State variables
+        // State variables (Default everything to 0 / empty for new users!)
         let currentDate = new Date();
         let transactions = [];
         let budgetSettings = { limit: 0, savingsGoal: 0 };
         let activeView = 'calendar';
 
+        // Only restore explicit guest mode here. Firebase restores real accounts
+        // through onAuthStateChanged after it verifies the session.
+        function restoreSessionImmediately() {
+            if (SafeStorage.get('campus_spend_guest') === 'true') {
+                unlockApp(null, true);
+                return true;
+            }
+            return false;
+        }
+
         // Initializer
-        window.onload = () => {
-            loadData();
+        document.addEventListener('DOMContentLoaded', () => {
             syncMonthPicker();
             initAuthListeners();
-            
-            // Check persisted login session so refreshing stays logged in
-            const savedUser = localStorage.getItem('campus_spend_user');
-            if (savedUser) {
-                try {
-                    const parsedUser = JSON.parse(savedUser);
-                    if (parsedUser && parsedUser.email) {
-                        unlockApp(parsedUser.email);
-                        return;
-                    }
-                } catch (e) {
-                    localStorage.removeItem('campus_spend_user');
-                }
+            if (!restoreSessionImmediately()) {
+                authModal.classList.remove('hidden');
+                appWrapper.classList.add('hidden');
+                appWrapper.classList.remove('flex');
             }
-            
-            render();
-        };
+        });
 
-        // Local Storage Handling
+        // Local Storage Handling (Scoped per user, defaulting to 0 for all new users)
         function loadData() {
-            const stored = localStorage.getItem('campus_spend_data');
+            const prefix = getUserStoragePrefix();
+            const stored = SafeStorage.get(`campus_spend_data_${prefix}`);
             if (stored) {
-                try { transactions = JSON.parse(stored); } catch (e) { transactions = []; }
+                try {
+                    transactions = JSON.parse(stored);
+                } catch (e) {
+                    transactions = [];
+                }
             } else {
-                transactions = getSampleData();
-                saveTransactions();
+                // Every new user starts with 0 transactions (no pre-filled fake data!)
+                transactions = [];
             }
 
-            const storedBudget = localStorage.getItem('campus_spend_budget');
+            const storedBudget = SafeStorage.get(`campus_spend_budget_${prefix}`);
             if (storedBudget) {
-                try { budgetSettings = JSON.parse(storedBudget); } catch (e) { budgetSettings = { limit: 5000, savingsGoal: 1000 }; }
+                try {
+                    budgetSettings = JSON.parse(storedBudget);
+                } catch (e) {
+                    budgetSettings = { limit: 0, savingsGoal: 0 };
+                }
             } else {
-                budgetSettings = { limit: 6000, savingsGoal: 1500 };
+                // Default budget limit and savings goal to 0 for new users
+                budgetSettings = { limit: 0, savingsGoal: 0 };
             }
         }
 
         function saveTransactions() {
-            localStorage.setItem('campus_spend_data', JSON.stringify(transactions));
+            const prefix = getUserStoragePrefix();
+            SafeStorage.set(`campus_spend_data_${prefix}`, JSON.stringify(transactions));
         }
 
         function saveBudget() {
-            localStorage.setItem('campus_spend_budget', JSON.stringify(budgetSettings));
+            const prefix = getUserStoragePrefix();
+            SafeStorage.set(`campus_spend_budget_${prefix}`, JSON.stringify(budgetSettings));
         }
 
         // Main Render Dispatcher
@@ -887,19 +1051,23 @@
             if (activeView === 'calendar') {
                 renderCalendar(monthlyData);
                 renderCategoryBreakdown(monthlyData);
-            } else {
+            } else if (activeView === 'transactions') {
                 renderTransactionList(monthlyData);
+            } else if (activeView === 'cash') {
+                renderCashWalletView(monthlyData);
             }
         }
 
-        // Filter Transactions by selected Month and Year
+        // Filter Transactions by selected Month and Year (Avoid timezone date shift bugs)
         function getFilteredTransactionsForCurrentMonth() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
 
             return transactions.filter(t => {
-                const d = new Date(t.date);
-                return d.getFullYear() === year && d.getMonth() === month;
+                const parts = t.date.split('-');
+                const tYear = parseInt(parts[0], 10);
+                const tMonth = parseInt(parts[1], 10) - 1;
+                return tYear === year && tMonth === month;
             });
         }
 
@@ -934,15 +1102,37 @@
             document.getElementById('monthPicker').value = `${year}-${month}`;
         }
 
-        // Render Financial Summary Cards in Rupee Format
+        // Render Financial Summary Cards in Rupee Format (Including Online vs Offline Cash breakdown)
         function renderSummaryCards(monthlyData) {
-            const income = monthlyData.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0);
-            const expense = monthlyData.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            const incomeEntries = monthlyData.filter(t => t.type === 'income');
+            const expenseEntries = monthlyData.filter(t => t.type === 'expense');
+
+            const income = incomeEntries.reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            const expense = expenseEntries.reduce((sum, t) => sum + parseFloat(t.amount), 0);
             const balance = income - expense;
+
+            // Calculate Online vs Offline Cash splits
+            const onlineIncome = incomeEntries.filter(t => (t.paymentMode || 'online') === 'online').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            const cashIncome = incomeEntries.filter(t => t.paymentMode === 'offline').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+            const onlineExpense = expenseEntries.filter(t => (t.paymentMode || 'online') === 'online').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+            const cashExpense = expenseEntries.filter(t => t.paymentMode === 'offline').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
+            const onlineBalance = onlineIncome - onlineExpense;
+            const cashBalance = cashIncome - cashExpense;
 
             document.getElementById('monthlyIncome').textContent = formatRupee(income);
             document.getElementById('monthlyExpense').textContent = formatRupee(expense);
             document.getElementById('monthlyBalance').textContent = formatRupee(balance);
+
+            document.getElementById('onlineIncomeDisplay').textContent = formatRupee(onlineIncome);
+            document.getElementById('cashIncomeDisplay').textContent = formatRupee(cashIncome);
+
+            document.getElementById('onlineExpenseDisplay').textContent = formatRupee(onlineExpense);
+            document.getElementById('cashExpenseDisplay').textContent = formatRupee(cashExpense);
+
+            document.getElementById('onlineBalanceDisplay').textContent = formatRupee(onlineBalance);
+            document.getElementById('cashBalanceDisplay').textContent = formatRupee(cashBalance);
 
             // Calculate ratios for the changing amount bars
             const totalCashflow = income + expense;
@@ -1004,7 +1194,8 @@
                 }
             } else {
                 spendBarEl.style.width = '0%';
-                spendMsgEl.textContent = 'Tap "Set Limits" to configure a limit.';
+                spendMsgEl.className = 'text-[11px] font-semibold text-slate-500';
+                spendMsgEl.textContent = 'Tap "Set Limits" to configure a budget limit.';
             }
 
             // Savings Goal Meter
@@ -1029,6 +1220,7 @@
                 }
             } else {
                 savingsBarEl.style.width = '0%';
+                savingsMsgEl.className = 'text-[11px] font-semibold text-slate-500';
                 savingsMsgEl.textContent = 'Set a target savings goal to track progress.';
             }
         }
@@ -1047,7 +1239,7 @@
             // Group expenses by day
             const dailyTotals = {};
             monthlyData.forEach(t => {
-                const day = new Date(t.date).getDate();
+                const day = parseInt(t.date.split('-')[2], 10);
                 if (!dailyTotals[day]) dailyTotals[day] = { income: 0, expense: 0 };
                 if (t.type === 'income') dailyTotals[day].income += parseFloat(t.amount);
                 else dailyTotals[day].expense += parseFloat(t.amount);
@@ -1099,7 +1291,7 @@
             const totalExpense = expenses.reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
             if (expenses.length === 0 || totalExpense === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic">No expenses recorded for this month.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-400 italic">No expenses recorded for this month yet.</p>`;
                 return;
             }
 
@@ -1133,50 +1325,96 @@
                 }).join('');
         }
 
+        // Helper to build transaction item HTML
+        function buildTransactionItemHTML(t) {
+            const isExpense = t.type === 'expense';
+            const isCash = t.paymentMode === 'offline';
+            const catSet = isExpense ? CATEGORIES.expense : CATEGORIES.income;
+            const meta = catSet.find(c => c.name === t.category) || { icon: 'fa-circle-dollar-to-slot', color: 'bg-slate-400' };
+            
+            const parts = t.date.split('-');
+            const dateObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const formattedDate = dateObj.toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            const modeBadge = isCash
+                ? `<span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[10px] font-extrabold"><i class="fa-solid fa-money-bill-wave mr-1"></i>Cash</span>`
+                : `<span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-[10px] font-extrabold"><i class="fa-solid fa-mobile-screen-button mr-1"></i>Online</span>`;
+
+            return `
+                <div class="py-3 flex items-center justify-between group hover:bg-slate-50/80 px-2 rounded-2xl transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-2xl ${meta.color} text-white flex items-center justify-center text-sm shadow-sm">
+                            <i class="fa-solid ${meta.icon}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h4 class="text-xs font-bold text-slate-800">${t.title}</h4>
+                                ${modeBadge}
+                            </div>
+                            <div class="flex items-center space-x-2 text-[11px] font-medium text-slate-400 mt-0.5">
+                                <span>${t.category}</span>
+                                <span>•</span>
+                                <span>${formattedDate}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-extrabold ${isExpense ? 'text-rose-600' : 'text-emerald-600'}">
+                            ${isExpense ? '-' : '+'}${formatRupee(t.amount)}
+                        </span>
+                        <button onclick="deleteEntry('${t.id}')" class="text-slate-300 hover:text-rose-500 transition p-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
         // Render Transactions List View
         function renderTransactionList(monthlyData) {
             const container = document.getElementById('transactionList');
             document.getElementById('transactionCount').textContent = `${monthlyData.length} entries`;
 
             if (monthlyData.length === 0) {
-                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs font-medium">No entries found for this month.</div>`;
+                container.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs font-medium">No entries found for this month. Tap "+ Add Entry" to start!</div>`;
                 return;
             }
 
-            const sorted = [...monthlyData].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const sorted = [...monthlyData].sort((a, b) => b.date.localeCompare(a.date));
+            container.innerHTML = sorted.map(t => buildTransactionItemHTML(t)).join('');
+        }
 
-            container.innerHTML = sorted.map(t => {
-                const isExpense = t.type === 'expense';
-                const catSet = isExpense ? CATEGORIES.expense : CATEGORIES.income;
-                const meta = catSet.find(c => c.name === t.category) || { icon: 'fa-circle-dollar-to-slot', color: 'bg-slate-400' };
-                const formattedDate = new Date(t.date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' });
+        // Render Dedicated Cash Wallet View
+        function renderCashWalletView(monthlyData) {
+            const cashEntries = monthlyData.filter(t => t.paymentMode === 'offline');
+            const onlineEntries = monthlyData.filter(t => (t.paymentMode || 'online') === 'online');
 
-                return `
-                    <div class="py-3 flex items-center justify-between group hover:bg-slate-50/80 px-2 rounded-2xl transition">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-2xl ${meta.color} text-white flex items-center justify-center text-sm shadow-sm">
-                                <i class="fa-solid ${meta.icon}"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-bold text-slate-800">${t.title}</h4>
-                                <div class="flex items-center space-x-2 text-[11px] font-medium text-slate-400 mt-0.5">
-                                    <span>${t.category}</span>
-                                    <span>•</span>
-                                    <span>${formattedDate}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="text-xs font-extrabold ${isExpense ? 'text-rose-600' : 'text-emerald-600'}">
-                                ${isExpense ? '-' : '+'}${formatRupee(t.amount)}
-                            </span>
-                            <button onclick="deleteEntry('${t.id}')" class="text-slate-300 hover:text-rose-500 transition p-1.5 opacity-100 sm:opacity-0 group-hover:opacity-100">
-                                <i class="fa-solid fa-trash-can text-xs"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            const cashIn = cashEntries.filter(t => t.type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0);
+            const cashOut = cashEntries.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0);
+            const cashNet = cashIn - cashOut;
+
+            const onlineIn = onlineEntries.filter(t => t.type === 'income').reduce((s, t) => s + parseFloat(t.amount), 0);
+            const onlineOut = onlineEntries.filter(t => t.type === 'expense').reduce((s, t) => s + parseFloat(t.amount), 0);
+            const onlineNet = onlineIn - onlineOut;
+
+            document.getElementById('walletCashIn').textContent = formatRupee(cashIn);
+            document.getElementById('walletCashOut').textContent = formatRupee(cashOut);
+            document.getElementById('walletCashNet').textContent = formatRupee(cashNet);
+
+            document.getElementById('walletOnlineIn').textContent = formatRupee(onlineIn);
+            document.getElementById('walletOnlineOut').textContent = formatRupee(onlineOut);
+            document.getElementById('walletOnlineNet').textContent = formatRupee(onlineNet);
+
+            document.getElementById('cashTransactionCount').textContent = `${cashEntries.length} cash entries`;
+            const listContainer = document.getElementById('cashTransactionList');
+
+            if (cashEntries.length === 0) {
+                listContainer.innerHTML = `<div class="py-8 text-center text-slate-400 text-xs font-medium">No physical cash entries recorded yet. Click "+ Add Cash" above to add cash income or expenses.</div>`;
+                return;
+            }
+
+            const sortedCash = [...cashEntries].sort((a, b) => b.date.localeCompare(a.date));
+            listContainer.innerHTML = sortedCash.map(t => buildTransactionItemHTML(t)).join('');
         }
 
         // View Switching
@@ -1184,30 +1422,68 @@
             activeView = view;
             const calendarBtn = document.getElementById('tabCalendarBtn');
             const transBtn = document.getElementById('tabTransactionsBtn');
+            const cashBtn = document.getElementById('tabCashWalletBtn');
+            
             const calendarView = document.getElementById('calendarView');
             const transView = document.getElementById('transactionsView');
+            const cashView = document.getElementById('cashWalletView');
+
+            const headerIcon = document.getElementById('viewHeaderIcon');
+            const headerTitle = document.getElementById('viewHeaderTitle');
+
+            const activeCls = 'px-3.5 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition flex items-center gap-1.5';
+            const inactiveCls = 'px-3.5 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-200/60 transition flex items-center gap-1.5';
+
+            calendarBtn.className = view === 'calendar' ? activeCls : inactiveCls;
+            transBtn.className = view === 'transactions' ? activeCls : inactiveCls;
+            cashBtn.className = view === 'cash' ? activeCls : inactiveCls;
+
+            calendarView.classList.toggle('hidden', view !== 'calendar');
+            transView.classList.toggle('hidden', view !== 'transactions');
+            cashView.classList.toggle('hidden', view !== 'cash');
 
             if (view === 'calendar') {
-                calendarBtn.className = 'px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition';
-                transBtn.className = 'px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition';
-                calendarView.classList.remove('hidden');
-                transView.classList.add('hidden');
-            } else {
-                transBtn.className = 'px-4 py-2 text-xs font-extrabold rounded-2xl bg-indigo-600 text-white shadow-sm transition';
-                calendarBtn.className = 'px-4 py-2 text-xs font-extrabold rounded-2xl text-slate-600 hover:bg-slate-100 transition';
-                transView.classList.remove('hidden');
-                calendarView.classList.add('hidden');
+                headerIcon.className = 'fa-solid fa-calendar-days text-indigo-600';
+                headerTitle.textContent = 'Monthly Calendar Overview';
+            } else if (view === 'transactions') {
+                headerIcon.className = 'fa-solid fa-list-ul text-indigo-600';
+                headerTitle.textContent = 'All Monthly Transactions';
+            } else if (view === 'cash') {
+                headerIcon.className = 'fa-solid fa-money-bill-wave text-amber-500';
+                headerTitle.textContent = 'Cash & Online Wallet Breakdown';
             }
+
             render();
         }
 
         // Modal Operations
         function openAddModal() {
             document.getElementById('entryForm').reset();
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('entryDate').value = today;
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('entryDate').value = `${yyyy}-${mm}-${dd}`;
+            
+            // Default to offline cash if currently viewing Cash Wallet tab
+            const defaultMode = activeView === 'cash' ? 'offline' : 'online';
+            const modeRadio = document.querySelector(`input[name="paymentMode"][value="${defaultMode}"]`);
+            if (modeRadio) modeRadio.checked = true;
+
             toggleCategoryOptions();
             document.getElementById('entryModal').classList.remove('hidden');
+        }
+
+        function openAddModalWithMode(mode) {
+            openAddModal();
+            const modeRadio = document.querySelector(`input[name="paymentMode"][value="${mode}"]`);
+            if (modeRadio) modeRadio.checked = true;
+            // Default to Income when clicking "+ Add Cash" or "+ Add Online" inside the wallet card
+            const incomeRadio = document.querySelector('input[name="type"][value="income"]');
+            if (incomeRadio) {
+                incomeRadio.checked = true;
+                toggleCategoryOptions();
+            }
         }
 
         function openAddModalWithDate(year, month, day) {
@@ -1252,14 +1528,15 @@
             e.preventDefault();
             const type = document.getElementById('directEditType').value;
             const targetAmount = parseFloat(document.getElementById('directEditAmount').value) || 0;
+            const walletMode = document.getElementById('directEditMode').value || 'online';
 
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
 
             // Remove existing transactions of this type for the current month
             transactions = transactions.filter(t => {
-                const d = new Date(t.date);
-                const isCurrentMonth = d.getFullYear() === year && d.getMonth() === month;
+                const parts = t.date.split('-');
+                const isCurrentMonth = parseInt(parts[0], 10) === year && (parseInt(parts[1], 10) - 1) === month;
                 return !(isCurrentMonth && t.type === type);
             });
 
@@ -1271,6 +1548,7 @@
                 transactions.push({
                     id: 'id_' + Date.now(),
                     type: type,
+                    paymentMode: walletMode,
                     date: formattedDate,
                     title: type === 'income' ? 'Adjusted Total Income' : 'Adjusted Total Expense',
                     amount: targetAmount,
@@ -1304,6 +1582,7 @@
             e.preventDefault();
 
             const type = document.querySelector('input[name="type"]:checked').value;
+            const paymentMode = document.querySelector('input[name="paymentMode"]:checked')?.value || 'online';
             const date = document.getElementById('entryDate').value;
             const title = document.getElementById('entryTitle').value.trim();
             const amount = parseFloat(document.getElementById('entryAmount').value);
@@ -1314,6 +1593,7 @@
             const newEntry = {
                 id: 'id_' + Date.now(),
                 type,
+                paymentMode,
                 date,
                 title,
                 amount,
@@ -1323,8 +1603,8 @@
             transactions.push(newEntry);
             saveTransactions();
 
-            const entryD = new Date(date);
-            currentDate = new Date(entryD.getFullYear(), entryD.getMonth(), 1);
+            const parts = date.split('-');
+            currentDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
 
             closeAddModal();
             render();
@@ -1397,17 +1677,21 @@
             // Populate Transaction Table
             const pdfTableBody = document.getElementById('pdfTransactionTableBody');
             if (monthlyData.length === 0) {
-                pdfTableBody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400 italic">No transactions found for this month.</td></tr>`;
+                pdfTableBody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-slate-400 italic">No transactions found for this month.</td></tr>`;
             } else {
-                const sorted = [...monthlyData].sort((a, b) => new Date(a.date) - new Date(b.date));
+                const sorted = [...monthlyData].sort((a, b) => a.date.localeCompare(b.date));
                 pdfTableBody.innerHTML = sorted.map(t => {
                     const isExp = t.type === 'expense';
-                    const dateFormatted = new Date(t.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                    const modeLabel = (t.paymentMode === 'offline') ? 'Cash' : 'Online';
+                    const parts = t.date.split('-');
+                    const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    const dateFormatted = dObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
                     return `
                         <tr>
                             <td class="py-2 px-3 text-slate-600">${dateFormatted}</td>
                             <td class="py-2 px-3 font-semibold text-slate-800">${t.title}</td>
                             <td class="py-2 px-3 text-slate-600">${t.category}</td>
+                            <td class="py-2 px-3 font-bold text-slate-600">${modeLabel}</td>
                             <td class="py-2 px-3 uppercase font-bold text-[10px] ${isExp ? 'text-rose-600' : 'text-emerald-600'}">${t.type}</td>
                             <td class="py-2 px-3 text-right font-bold ${isExp ? 'text-rose-600' : 'text-emerald-600'}">${isExp ? '-' : '+'}${formatRupee(t.amount)}</td>
                         </tr>
@@ -1432,23 +1716,6 @@
                 pdfContainer.classList.add('hidden');
             });
         }
-
-        // Sample Data
-        function getSampleData() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-
-            return [
-                { id: '1', type: 'income', date: `${year}-${month}-01`, title: 'Monthly Pocket Money', amount: 8000, category: 'Pocket Money' },
-                { id: '2', type: 'expense', date: `${year}-${month}-02`, title: 'Canteen & Snacks', amount: 350, category: 'Food & Canteen' },
-                { id: '3', type: 'expense', date: `${year}-${month}-05`, title: 'Stationery & Photocopy', amount: 200, category: 'Books & Stationeries' },
-                { id: '4', type: 'expense', date: `${year}-${month}-10`, title: 'PG Rent Share', amount: 3500, category: 'Rent & PG Fee' },
-                { id: '5', type: 'expense', date: `${year}-${month}-14`, title: 'Mobile & Wifi Recharge', amount: 499, category: 'Recharge & Wifi' },
-                { id: '6', type: 'income', date: `${year}-${month}-18`, title: 'Assignment Freelancing', amount: 1500, category: 'Part-time Work' }
-            ];
-        }
     </script>
 </body>
 </html>
-
